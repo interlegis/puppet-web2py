@@ -60,7 +60,12 @@ class web2py ( $source     = 'http://www.web2py.com/examples/static/web2py_src.z
   if !$sslcert or !$sslkey {
     fail("You won't be able to access the administrative interface without specifying sslcert and sslkey variables.")
   } else {
-    nginx::resource::vhost { $vhost:
+    nginx::resource::vhost { "$vhost":
+      www_root => "$target/web2py",
+      location_cfg_append => { 'rewrite' => '^ https://$server_name$request_uri? permanent' },
+    }
+
+    nginx::resource::vhost { "web2py":
       www_root => "$target/web2py/",
       fastcgi => "unix:/tmp/fcgi.sock",
       ssl => true,
